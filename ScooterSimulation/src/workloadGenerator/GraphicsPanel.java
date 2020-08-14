@@ -56,7 +56,7 @@ public class GraphicsPanel extends JPanel{
 			g2D.setColor(new Color(Math.max(250 - green,50), Math.min(green,200), 0));
 			g2D.fillOval(points[i][0]-vertexSize/2, points[i][1]-vertexSize/2, vertexSize, vertexSize);
 			g2D.setColor(Color.black);
-			g2D.drawString(""+i, points[i][0]-4, points[i][1]+4);
+			g2D.drawString(""+scooters[i], points[i][0]-4, points[i][1]+4);
 		} 
 		
 	}
