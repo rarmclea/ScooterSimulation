@@ -47,50 +47,50 @@
 114.7058824	127.9187817	120	100.6451613	79.7274276	57.42331288	55.25383707
 </Intertrip Time Distribution>
 <Location Graph>
-v	1	50	25	25	14th St & 17th Ave 
-v	2	25	25	187	13th St & 17th Ave 
-v	3	25	28	330	12th St & 17th Ave 
-v	4	25	25	487	11th St & 17th Ave (S)
-v	5	25	30	573	11th St & 17th Ave (N)
-v	6	25	28	642	10a St & 17th Ave 
-v	7	25	25	789	10th St & 17th Ave (S)
-v	8	25	27	824	10th St & 17th Ave (N)
-v	9	25	27	928	9a St & 17th Ave 
-v	10	25	95	25	14th St & 16th Ave 
-v	11	10	93	86	Alley & 16th Ave  
-v	12	10	84	331	12th St & 16th Ave 
-v	13	10	78	575	11th St & 16th Ave 
-v	14	10	69	823	10th St & 16th Ave 
-v	15	25	141	26	14th St & Alley  
-v	16	10	141	91	Alley & Alley   
-v	17	10	134	332	12th St & Alley  
-v	18	25	191	25	14th St & 15th Ave 
-v	19	10	181	337	12th St & 15th Ave 
-v	20	10	175	583	11th St & 15th Ave 
-v	21	10	166	828	10th St & 15th Ave 
-v	22	25	237	27	14th St & Alley  
-v	23	10	227	339	12th St & Alley  
-v	24	10	222	588	11th St & Alley  
-v	25	10	214	833	10th St & Alley  
-v	26	25	285	25	14th St & 14th Ave 
-v	27	10	274	343	12th St & 14th Ave 
-v	28	10	270	590	11th St & 14th Ave 
-v	29	10	263	837	10th St & 14th Ave 
-v	30	25	335	26	14th St and Alley
-v	31	10	325	351	12th St and Alley
-v	32	10	319	595	11th St and Alley
-v	33	25	384	29	14th St and 13th Ave
-v	34	10	373	355	12th St and 13th Ave
-v	35	10	369	596	11th St and 13th Ave
-v	36	10	359	845	10th St and 13th Ave
-v	37	25	431	30	14th St and Alley
-v	38	10	419	361	12th St and Alley
-v	39	10	413	602	11th St and Alley
-v	40	10	405	849	10th St and Alley
-v	41	50	477	29	14th St and 12th Ave
-v	42	25	468	365	12 St and 12th Ave
-v	43	25	459	604	11th St and 12th Ave
-v	44	25	451	851	10th St and 12th Ave
+v	0	50	25	25	14th St & 17th Ave 
+v	1	25	25	187	13th St & 17th Ave 
+v	2	25	28	330	12th St & 17th Ave 
+v	3	25	25	487	11th St & 17th Ave (S)
+v	4	25	30	573	11th St & 17th Ave (N)
+v	5	25	28	642	10a St & 17th Ave 
+v	6	25	25	789	10th St & 17th Ave (S)
+v	7	25	27	824	10th St & 17th Ave (N)
+v	8	25	27	928	9a St & 17th Ave 
+v	9	25	95	25	14th St & 16th Ave 
+v	10	10	93	86	Alley & 16th Ave  
+v	11	10	84	331	12th St & 16th Ave 
+v	12	10	78	575	11th St & 16th Ave 
+v	13	10	69	823	10th St & 16th Ave 
+v	14	25	141	26	14th St & Alley  
+v	15	10	141	91	Alley & Alley   
+v	16	10	134	332	12th St & Alley  
+v	17	25	191	25	14th St & 15th Ave 
+v	18	10	181	337	12th St & 15th Ave 
+v	19	10	175	583	11th St & 15th Ave 
+v	20	10	166	828	10th St & 15th Ave 
+v	21	25	237	27	14th St & Alley  
+v	22	10	227	339	12th St & Alley  
+v	23	10	222	588	11th St & Alley  
+v	24	10	214	833	10th St & Alley  
+v	25	25	285	25	14th St & 14th Ave 
+v	26	10	274	343	12th St & 14th Ave 
+v	27	10	270	590	11th St & 14th Ave 
+v	28	10	263	837	10th St & 14th Ave 
+v	29	25	335	26	14th St and Alley
+v	30	10	325	351	12th St and Alley
+v	31	10	319	595	11th St and Alley
+v	32	25	384	29	14th St and 13th Ave
+v	33	10	373	355	12th St and 13th Ave
+v	34	10	369	596	11th St and 13th Ave
+v	35	10	359	845	10th St and 13th Ave
+v	36	25	431	30	14th St and Alley
+v	37	10	419	361	12th St and Alley
+v	38	10	413	602	11th St and Alley
+v	39	10	405	849	10th St and Alley
+v	40	50	477	29	14th St and 12th Ave
+v	41	25	468	365	12 St and 12th Ave
+v	42	25	459	604	11th St and 12th Ave
+v	43	25	451	851	10th St and 12th Ave
 e	1	2	113.28
 e	1	10	77.46
 e	2	3	100.9

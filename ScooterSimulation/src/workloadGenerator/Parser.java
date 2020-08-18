@@ -56,21 +56,15 @@ public class Parser {
 		LocationGraph l = new LocationGraph();
 		String line; 
 		String[] values;
+		int edgeCount = 0;
 		while ((line = in.readLine()) != null){
 			if (line.contains("</Location Graph>")) break;
-			String name = "";
 			values = line.split("\t");
 			if (values[0].equals("v")){
-//				for (int i = 5; i < values.length; i++){
-//					name += values[i];
-//					if (i < values.length - 1){
-//						name += " ";
-//					}
-//				}
 				l.addVertex(new Vertex(values[5], Integer.parseInt(values[1]), Integer.parseInt(values[2]), Integer.parseInt(values[3]), Integer.parseInt(values[4])));
 			}
 			if (values[0].equals("e")){
-				l.addEdge(new Edge(Integer.parseInt(values[1]), Integer.parseInt(values[2]),Double.parseDouble(values[3])));
+				l.addEdge(new Edge(edgeCount++, Integer.parseInt(values[1]), Integer.parseInt(values[2]),Double.parseDouble(values[3])));
 			}
 		}
 		return l;
@@ -79,6 +73,4 @@ public class Parser {
 	public String getLine() throws IOException {
 		return in.readLine();
 	}
-	
-
 }

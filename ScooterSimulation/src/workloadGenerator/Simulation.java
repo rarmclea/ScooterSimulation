@@ -127,15 +127,6 @@ public class Simulation extends Thread{
 				day = date % 7;
 			}
 			meanIntertripTime = meanIntertripTimes[day][hour];
-//			if (current.time > next){
-//				System.out.print("|");
-//				next += increment;
-//			}
-//			try {
-//				sleep(10);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
 		}
 		handleSimulationEnd();
 		try {
@@ -218,7 +209,16 @@ public class Simulation extends Thread{
 				success = true;
 				s.inUse = true;
 				numScootersInUse++;
-				t.distance = locations.getDist(s.currentLocation, destination);
+				int[] path = locations.getPath(origin.id, destination);
+				int index = destination;
+				for (int i = 0; i < path.length; i++){
+					if (path[index] < 0) break;
+					Edge e = locations.getEdge(index+1, path[index]+1);
+					e.numScooters++;
+					t.distance += e.distance;
+					display.updateEdge(e.id, e.numScooters);
+					index = path[index];
+				}
 				t.duration = t.distance /random.speed(speedDist);
 				s.distanceTravelled += t.distance;
 				totalDistance += t.distance;
@@ -227,7 +227,7 @@ public class Simulation extends Thread{
 				s.remainingBattery -= t.distance / range;
 				numTrips++;
 				origin.scooters.remove(s);
-				eventList.add(new Event('E', time+t.duration, t.id, s, destination));
+				eventList.add(new Event('E', time+t.duration, t.id,path, s, destination));
 
 				if (DEBUG){
 					out.append("\n" + printTime(time) + " --> Trip " + t.id + " started at " + locations.getVertexName(s.currentLocation) + " on scooter " + s.id);
@@ -253,19 +253,12 @@ public class Simulation extends Thread{
 		int destination = locations.getWeightedRandomVertex(random.location(), origin.id, false).id;
 		boolean success = tripStartHelper(origin, start.time, destination);
 		if (!success){
-
-			double[] distances = locations.getShortestSpanningTree(origin.id);
-			ArrayList<Vertex> neighbours = getNearestNeighbours(distances);
-//			ArrayList<Vertex> neighbours = locations.getNeighbours(origin.id);
-
+			ArrayList<Vertex> neighbours = locations.getNearestVertices(origin.id, walkingRadius);
 			for (Vertex v : neighbours){
-				if (distances[v.id-1] > walkingRadius || v.id == destination){
-					break;
-				}
+				if (v.id == destination) break;
 				success = tripStartHelper(v, start.time, destination);
 				if (success) {
-					distanceWalked += distances[v.id - 1];
-//					distanceWalked += locations.getEdge(origin.id, v.id).distance;
+					distanceWalked += locations.getDist(origin.id, v.id);
 					numWalkTrips++;
 					break;
 				}
@@ -278,34 +271,11 @@ public class Simulation extends Thread{
 				out.setCaretPosition(out.getDocument().getLength());
 			}
 		}
-		display.updateScooters(origin.id-1, origin.scooters.size());
+		display.updateScooters(origin.id, origin.scooters.size());
 		display.repaint();
 		eventList.add(new Event('S', start.time+random.newTripTime(meanIntertripTime)));	
 	}
 	
-	private ArrayList<Vertex> getNearestNeighbours(double[] distances) {
-		double[] dist = new double[distances.length];
-		for (int i = 0; i < distances.length; i++){
-			dist[i] = distances[i];
-		}
-		ArrayList<Vertex> neighbours = new ArrayList<Vertex>();
-		for (int i = 0; i < dist.length; i++){
-			double minDist = Double.MAX_VALUE;
-			int minIndex = -1;
-			for (int j = 0; j < dist.length; j++){
-				if (dist[j] < minDist && dist[j] != 0){
-					minDist = dist[j];
-					minIndex = j;
-				}
-			}
-			if (minIndex == -1) continue;
-			dist[minIndex] = Double.MAX_VALUE;
-			neighbours.add(locations.getVertex(minIndex+1));			
-		}
-		
-		return neighbours;
-	}
-
 	public void handleTripEnd(Event end){
 		numScootersInUse--;
 		Scooter s = end.scooter;
@@ -313,7 +283,15 @@ public class Simulation extends Thread{
 		s.currentLocation = end.location;
 		Vertex v = locations.getVertex(end.location);
 		v.scooters.add(s);
-		display.updateScooters(v.id-1, v.scooters.size());
+		int index = end.location;
+		for (int i = 0; i < end.path.length; i++){
+			if (end.path[index] < 0) break;
+			Edge e = locations.getEdge(index+1, end.path[index]+1);
+			e.numScooters--;
+			display.updateEdge(e.id, e.numScooters);
+			index = end.path[index];
+		}
+		display.updateScooters(v.id, v.scooters.size());
 		display.repaint();
 		if (DEBUG){
 			out.append("\n" + printTime(end.time) + "--> Trip " + end.trip + " ended at " + locations.getVertexName(end.location) + " on scooter " + s.id);

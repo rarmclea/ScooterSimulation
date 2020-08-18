@@ -51,14 +51,15 @@ public class LocationGraph {
 		return minIndex;
 	}
 	
-	public double getDist(int v1, int v2){
-		if (v1 == v2) return 0;
+
+	public int[] getPath(int v1, int v2){
+		if (v1 == v2) return null;
 		//Dijkstra's
 		int prev[] = new int[vertices.size()];
 		double dist[] = new double[vertices.size()];
 		boolean processed[] = new boolean[vertices.size()];
 		for (int i = 0; i < vertices.size(); i++){
-			if (i == (v1-1)){
+			if (i == (v1)){
 				dist[i] = 0;
 			} else {
 				dist[i] = Double.MAX_VALUE;
@@ -70,7 +71,7 @@ public class LocationGraph {
 		for (int i = 0; i < vertices.size()-1; i++){
 			int u = minDistance(dist, processed);
 			processed[u] = true;
-			if (u == v2-1) break;
+			if (u == v2) break;
 			for (int v = 0; v < vertices.size(); v ++){
 				Edge e = getEdge(u+1,v+1);
 				if (!processed[v] && e != null && dist[u] + e.distance < dist[v]){
@@ -81,8 +82,16 @@ public class LocationGraph {
 		}
 		
 		
+		return prev;
+		
+	}
+	
+	public double getDist(int v1, int v2){
+		if (v1 == v2) return 0;
+		int[] prev = getPath(v1, v2);
+		
 		double pathDistance = 0;
-		int index = (v2-1);
+		int index = (v2);
 		while (prev[index] != -1){
 			pathDistance += getEdge(index+1, prev[index]+1).distance;
 			index = prev[index];
@@ -92,11 +101,11 @@ public class LocationGraph {
 	}
 	
 	public String getVertexName(int id){
-		return vertices.get(id-1).name;
+		return vertices.get(id).name;
 	}
 	
 	public Vertex getVertex(int id){
-		return vertices.get(id-1);
+		return vertices.get(id);
 	}
 	
 	public Vertex getFavouritVertex(){
@@ -123,14 +132,7 @@ public class LocationGraph {
 		}
 		return sum;
 	}
-	
-//	public int getWeightedVertexSelect(int random){
-//		for (Vertex v : vertices) {
-//			random -= v.weight;
-//			if (random <= 0) return v.id;
-//		}
-//		return 1;
-//	}
+
 	
 	public Vertex getWeightedRandomVertex(double r, int current, boolean countScooters) {
         double completeWeight = 0.0;
@@ -154,18 +156,17 @@ public class LocationGraph {
         }
         throw new RuntimeException("Should never be shown.");
     }
-	public double[] getShortestSpanningTree(int root){
+	public ArrayList<Vertex> getNearestVertices(int root, double maxDist){
 		ArrayList<Vertex> neighbours = new ArrayList<Vertex>();
 		int prev[] = new int[vertices.size()];
 		double dist[] = new double[vertices.size()];
 		boolean processed[] = new boolean[vertices.size()];
 		for (int i = 0; i < vertices.size(); i++){
-			if (i == (root-1)){
+			if (i == root){
 				dist[i] = 0;
 			} else {
 				dist[i] = Double.MAX_VALUE;
 			}
-			prev[i] = -1;
 			processed[i] = false;
 		}
 		
@@ -176,12 +177,26 @@ public class LocationGraph {
 				Edge e = getEdge(u+1,v+1);
 				if (!processed[v] && e != null && dist[u] + e.distance < dist[v]){
 					dist[v] = dist[u]+e.distance;
-					prev[v] = u;
 				}
 			}
 		}
+
+		for (int i = 0; i < vertices.size(); i++){
+			double minValue = Double.MAX_VALUE;
+			int minIndex = -1;
+			for (int j = 0; j < vertices.size(); j++){
+				if (dist[j] > maxDist) continue;
+				else if (dist [j] < minValue){
+					minValue = dist[j];
+					minIndex = j;
+				}
+			}
+			if (minIndex == -1) break;
+			neighbours.add(vertices.get(minIndex));
+			dist[minIndex] = Double.MAX_VALUE;
+		}
 		
-		return dist;
+		return neighbours;
 	}
 
 	public ArrayList<Vertex> getNeighbours(int id) {
