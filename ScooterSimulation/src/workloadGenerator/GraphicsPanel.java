@@ -34,7 +34,7 @@ public class GraphicsPanel extends JPanel{
 			edges[i][1] = e.v2ID-1;
 			edgeScooters[i] = e.numScooters;
 		}
-		increment = 50 / (numScooters / 100);
+		increment = 50 / Math.max(numScooters / 100, 1);
 		
 	}
 	public void updateScooters(int index, int numScooters){
