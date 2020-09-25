@@ -6,8 +6,10 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 public class SimulatorView extends JFrame{
-	JLabel inputFileLabel, numScootersLabel, maxDistanceLabel, chargingThresholdLabel, numDaysLabel, walkingRadiusLabel;
-	JTextField inputFileInput, numScootersInput, maxDistanceInput, chargingThresholdInput, numDaysInput, walkingRadiusInput;
+	JLabel inputFileLabel, numScootersLabel, maxDistanceLabel, chargingThresholdLabel, numDaysLabel, maxWalkingDistanceLabel,
+			chargingShiftTimesLabel;
+	JTextField inputFileInput, numScootersInput, maxDistanceInput, chargingThresholdInput, numDaysInput, maxWalkingDistanceInput,
+			chargingShiftTimesInput;
 	JButton runSimulator;
 	JTextArea displaySimulation, displaySimulationResults;
 	JScrollPane jsp2;
@@ -55,6 +57,10 @@ public class SimulatorView extends JFrame{
 		input4.setBackground(PANEL);
 		chargingThresholdLabel = new JLabel("Battery % to begin chargin scooters (between 0 and 1): ");
 		chargingThresholdInput = new JTextField("" + Simulator.defaultChargingThreshold, 5);
+		JPanel input8 = new JPanel();
+		input8.setBackground(PANEL);
+		chargingShiftTimesLabel = new JLabel("Charging shift times:");
+		chargingShiftTimesInput = new JTextField("5,12,19", 5);
 		JPanel input5 = new JPanel();
 		input5.setBackground(PANEL);
 		numDaysLabel = new JLabel("Number of days simulated: ");
@@ -64,8 +70,8 @@ public class SimulatorView extends JFrame{
 		runSimulator = new JButton("Run Simulation");
 		JPanel input7 = new JPanel();
 		input7.setBackground(PANEL);
-		walkingRadiusLabel = new JLabel("Maximum walking radius: ");
-		walkingRadiusInput = new JTextField("" + Simulator.defaultWalkingRadius, 5);
+		maxWalkingDistanceLabel = new JLabel("Maximum walking distance: ");
+		maxWalkingDistanceInput = new JTextField("" + Simulator.defaultMaxWalkingDistance, 5);
 		//add simulation input components
 		input1.add(inputFileLabel);
 		input1.add(inputFileInput);
@@ -75,11 +81,13 @@ public class SimulatorView extends JFrame{
 		input3.add(maxDistanceInput);
 		input4.add(chargingThresholdLabel);
 		input4.add(chargingThresholdInput);
+		input8.add(chargingShiftTimesLabel);
+		input8.add(chargingShiftTimesInput);
 		input5.add(numDaysLabel);
 		input5.add(numDaysInput);
 		input6.add(runSimulator);
-		input7.add(walkingRadiusLabel);
-		input7.add(walkingRadiusInput);
+		input7.add(maxWalkingDistanceLabel);
+		input7.add(maxWalkingDistanceInput);
 		
 		
 
@@ -88,6 +96,7 @@ public class SimulatorView extends JFrame{
 		simulationInputs.add(input2);
 		simulationInputs.add(input3);
 		simulationInputs.add(input4);
+		simulationInputs.add(input8);
 		simulationInputs.add(input5);
 		simulationInputs.add(input7);
 		simulationInputs.add(input6);

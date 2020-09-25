@@ -23,6 +23,17 @@ public class Simulation extends Thread{
 	JTextArea out, results;
 	GraphicsPanel display;
 	
+	double avgHumanMass = 80; //kg
+	double avgScooterMass = 12.4;//kg
+	double dragCoefficient = 1.2;
+	double dragArea = 0.75; //m^2
+	double airDensity = 1.225; //kg/m^3
+	double rollingResistance = 0.008; 
+	double gravity = 9.81; //m/s^2
+	double propulsionEfficiency = 0.75; 
+	
+	long delay = 100;
+	
 	private boolean DEBUG = true;
 	
 	//Simulation Variables
@@ -30,6 +41,7 @@ public class Simulation extends Thread{
 	double meanTripDuration = 771.033; //seconds
 	double[][] meanIntertripTimes = new double[7][24];
 	double meanIntertripTime;
+	double maxBatteryCapacity = 900000;
 	double range = 32186.88;
 	static double defaultRange = 32186.88;
 	double maxSpeed = 8.9; //m/s
@@ -38,13 +50,16 @@ public class Simulation extends Thread{
 	double chargingThreshold = 0.25;
 	static int defaultNumDays = 28;
 	double[][] speedDist;
-	static double defaultWalkingRadius = 200;//m
-	double walkingRadius;
+	static double defaultMaxWalkingDistance = 200;//m
+	double maxWalkingDistance;
+	int[] chargingTimes = {5, 12, 19};
+	ArrayList<Scooter> charging;
 	
 	double stopTime = defaultNumDays * 86400; //x * day
 	
 	static int defaultNumScooters = 100;
 	int numScooters = 100;
+	ArrayList<Scooter> inTransit;
 	
 	static String defaultInputFile = "inputs1";
 	
@@ -62,14 +77,16 @@ public class Simulation extends Thread{
 	int numWalkTrips = 0;
 	double distanceWalked = 0;
 	
-	public Simulation(int numScooters, double range, double chargingThreshold, double stopTime, double walkingRadius, 
+	public Simulation(int numScooters, double range, double chargingThreshold, double stopTime, double maxWalkingDistance, int[] chargingShiftTimes,
 					  String filename, JTextArea out, JTextArea results, GraphicsPanel graphics){
 		random = new RNG(meanTripDuration, meanTripDistance);
+		inTransit = new ArrayList<Scooter>();
 		this.numScooters = numScooters;
 		this.range = range;
 		this.chargingThreshold = chargingThreshold;
+		this.chargingTimes = chargingShiftTimes;
 		this.stopTime = stopTime;
-		this.walkingRadius = walkingRadius;
+		this.maxWalkingDistance = maxWalkingDistance;
 		this.out = out;
 		this.results = results;
 		this.display = graphics;
@@ -99,26 +116,22 @@ public class Simulation extends Thread{
 				handleTripStart(current);
 			} else if (current.value == 'E'){
 				handleTripEnd(current);
+			} else if (current.value == 'R'){
+				redistribute();
 			}
 			if (current.time - date * 86400 > (hour + 1) * 3600){
 				hour = (hour + 1) % 24;
-				if (hour == 22){
-					for (Vertex v : locations.vertices){
-						for (Scooter s : v.scooters){
-							if (s.remainingBattery < chargingThreshold){
-								s.charging = true;
+				for (int t : chargingTimes){
+					if (hour == t){
+						for (Vertex v : locations.vertices){
+							for (Scooter s : v.scooters){
+								if (s.remainingBattery < chargingThreshold){
+									s.charging = true;
+								}
 							}
 						}
-					}
-				} else if (hour == 6){
-					for (Vertex v : locations.vertices){
-						for (Scooter s : v.scooters){
-							if (s.charging){
-								s.charging = false;
-								s.numTimesRecharged++;
-								s.remainingBattery = 0.95;
-							}
-						}
+						eventList.add(new Event('R', current.time + 5*3550));
+						break;
 					}
 				}
 			}
@@ -127,6 +140,12 @@ public class Simulation extends Thread{
 				day = date % 7;
 			}
 			meanIntertripTime = meanIntertripTimes[day][hour];
+//			try {
+//				sleep(delay);
+//			} catch (InterruptedException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
 		}
 		handleSimulationEnd();
 		try {
@@ -134,6 +153,19 @@ public class Simulation extends Thread{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void redistribute() {
+		for (Vertex v : locations.vertices){
+			for (Scooter s : v.scooters){
+				if (s.charging){
+					s.charging = false;
+					s.numTimesRecharged++;
+					s.remainingBattery = 0.95;
+				}
+			}
+		}
+		
 	}
 
 	public void load(String filename){
@@ -184,6 +216,10 @@ public class Simulation extends Thread{
 				scooterStats.newLine();
 				}
 			}
+			for (Scooter s : inTransit){
+				scooterStats.write(s.id + "\t" + s.inUse + "\t" + s.distanceTravelled + "\t\t" + s.remainingBattery + "\t" + s.numTimesRecharged + "\t" + s.charging + "\t$" + s.revenue);
+				scooterStats.newLine();
+			}
 
 			scooterStats.close();
 		} catch (IOException e) {
@@ -219,14 +255,19 @@ public class Simulation extends Thread{
 					display.updateEdge(e.id, e.numScooters);
 					index = path[index];
 				}
-				t.duration = t.distance /random.speed(speedDist);
+				double velocity = random.speed(speedDist);
+				t.duration = t.distance / velocity;
 				s.distanceTravelled += t.distance;
 				totalDistance += t.distance;
 				totalTime += t.duration;
 				s.revenue += (t.duration / 60) * 0.3 + 1;
+//				s.remainingBattery -=((((airDensity/2)*dragCoefficient*dragArea*velocity*velocity*t.distance)
+//						+(rollingResistance*(avgHumanMass + avgScooterMass)*gravity*t.distance))
+//						/propulsionEfficiency )/ maxBatteryCapacity;
 				s.remainingBattery -= t.distance / range;
 				numTrips++;
 				origin.scooters.remove(s);
+				inTransit.add(s);
 				eventList.add(new Event('E', time+t.duration, t.id,path, s, destination));
 
 				if (DEBUG){
@@ -253,7 +294,7 @@ public class Simulation extends Thread{
 		int destination = locations.getWeightedRandomVertex(random.location(), origin.id, false).id;
 		boolean success = tripStartHelper(origin, start.time, destination);
 		if (!success){
-			ArrayList<Vertex> neighbours = locations.getNearestVertices(origin.id, walkingRadius);
+			ArrayList<Vertex> neighbours = locations.getNearestVertices(origin.id, maxWalkingDistance);
 			for (Vertex v : neighbours){
 				if (v.id == destination) break;
 				success = tripStartHelper(v, start.time, destination);
@@ -266,6 +307,12 @@ public class Simulation extends Thread{
 		}
 		if (!success){
 			numFailedTrips++;
+			try {
+				tripStats.write("Unserved\t" + date + "\t" + days[day] + "\t" + hour + "\t" + 0 + "\t" + 0 + "\r\n");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if (DEBUG){
 				out.append("\n" + printTime(start.time) + " --> Trip failed: Scooter not available");
 				out.setCaretPosition(out.getDocument().getLength());
@@ -282,6 +329,7 @@ public class Simulation extends Thread{
 		s.inUse = false;
 		s.currentLocation = end.location;
 		Vertex v = locations.getVertex(end.location);
+		inTransit.remove(s);
 		v.scooters.add(s);
 		int index = end.location;
 		for (int i = 0; i < end.path.length; i++){
@@ -327,7 +375,7 @@ public class Simulation extends Thread{
 		//scooter distribution
 		//walk time/distance 
 
-//		printScooters();
+		printScooters();
 		
 	}
 
